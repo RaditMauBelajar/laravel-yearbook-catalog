@@ -123,57 +123,57 @@ class BookController extends Controller
      * Update the specified book
      */
     public function update(BookRequest $request, Book $book)
-    {
-        try {
-            // Upload cover image (jika ada)
-            if ($request->hasFile('cover_image')) {
-                // Delete old cover
-                if ($book->cover_image) {
-                    Storage::disk('public')->delete($book->cover_image);
-                }
-                $book->cover_image = $request->file('cover_image')->store('covers', 'public');
+{
+    try {
+        // Upload cover image (jika ada)
+        if ($request->hasFile('cover_image')) {
+            // Delete old cover
+            if ($book->cover_image) {
+                Storage::disk('public')->delete($book->cover_image);
             }
-
-            // Upload PDF (jika ada)
-            if ($request->hasFile('pdf_file')) {
-                // Delete old PDF
-                if ($book->pdf_file) {
-                    Storage::disk('public')->delete($book->pdf_file);
-                }
-                $pdf = $request->file('pdf_file');
-                $book->pdf_file = $pdf->store('pdfs', 'public');
-                $book->pdf_size = $pdf->getSize();
-            }
-
-            // Update data
-            $book->title = $request->title;
-            $book->year = $request->year;
-            $book->school_name = $request->school_name;
-            $book->description = $request->description;
-            $book->video_url = $request->video_url;
-            $book->access_username = $request->access_username;
-
-            // Update password hanya jika diisi
-            if ($request->filled('access_password')) {
-                $book->access_password = $request->access_password;
-            }
-
-            $book->status = $request->status;
-            $book->save();
-
-            // Upload pages baru (jika ada)
-            if ($request->hasFile('pages')) {
-                $this->uploadPages($book, $request->file('pages'));
-            }
-
-            return redirect()->route('admin.books.index')
-                ->with('success', 'Buku berhasil diperbarui!');
-
-        } catch (\Exception $e) {
-            return back()->withInput()
-                ->with('error', 'Gagal memperbarui buku: ' . $e->getMessage());
+            $book->cover_image = $request->file('cover_image')->store('covers', 'public');
         }
+
+        // Upload PDF (jika ada)
+        if ($request->hasFile('pdf_file')) {
+            // Delete old PDF
+            if ($book->pdf_file) {
+                Storage::disk('public')->delete($book->pdf_file);
+            }
+            $pdf = $request->file('pdf_file');
+            $book->pdf_file = $pdf->store('pdfs', 'public');
+            $book->pdf_size = $pdf->getSize();
+        }
+
+        // Update data
+        $book->title = $request->title;
+        $book->year = $request->year;
+        $book->school_name = $request->school_name;
+        $book->description = $request->description;
+        $book->video_url = $request->video_url;
+        $book->access_username = $request->access_username;
+
+        // Update password hanya jika diisi
+        if ($request->filled('access_password')) {
+            $book->access_password = $request->access_password; // Auto hashed di mutator
+        }
+
+        $book->status = $request->status;
+        $book->save();
+
+        // Upload pages baru (jika ada)
+        if ($request->hasFile('pages')) {
+            $this->uploadPages($book, $request->file('pages'));
+        }
+
+        return redirect()->route('admin.books.index')
+            ->with('success', 'Buku berhasil diperbarui!');
+
+    } catch (\Exception $e) {
+        return back()->withInput()
+            ->with('error', 'Gagal memperbarui buku: ' . $e->getMessage());
     }
+}
 
     /**
      * Remove the specified book
