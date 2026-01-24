@@ -62,20 +62,19 @@ class Book extends Model
     // ========================================
 
     public function getCoverUrlAttribute()
-    {
-        if ($this->cover_image) {
-            return Storage::url($this->cover_image);
-        }
-        return asset('images/no-cover.jpg'); // fallback image
-    }
+{
+    return $this->cover_image
+        ? asset('storage/' . $this->cover_image)
+        : asset('images/no-cover.jpg');
+}
 
     public function getPdfUrlAttribute()
-    {
-        if ($this->pdf_file) {
-            return Storage::url($this->pdf_file);
-        }
-        return null;
-    }
+{
+    return $this->pdf_file
+        ? asset('storage/' . $this->pdf_file)
+        : null;
+}
+
 
     public function getPdfSizeFormattedAttribute()
     {
@@ -199,18 +198,18 @@ class Book extends Model
         static::deleting(function ($book) {
             // Delete cover image
             if ($book->cover_image) {
-                Storage::delete($book->cover_image);
+                Storage::disk('public')->delete($book->cover_image);
             }
 
             // Delete PDF
             if ($book->pdf_file) {
-                Storage::delete($book->pdf_file);
+                Storage::disk('public')->delete($book->pdf_file);
             }
 
             // Delete all page images
             foreach ($book->pages as $page) {
                 if ($page->image_path) {
-                    Storage::delete($page->image_path);
+                    Storage::disk('public')->delete($page->image_path);
                 }
             }
         });

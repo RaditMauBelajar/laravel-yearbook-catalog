@@ -37,12 +37,12 @@ class BookPage extends Model
     // ========================================
 
     public function getImageUrlAttribute()
-    {
-        if ($this->image_path) {
-            return Storage::url($this->image_path);
-        }
-        return asset('images/no-page.jpg');
-    }
+{
+    return $this->image_path
+        ? asset('storage/' . $this->image_path)
+        : asset('images/no-page.jpg');
+}
+
 
     public function getFileSizeFormattedAttribute()
     {
